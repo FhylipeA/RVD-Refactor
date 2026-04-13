@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model RvdVenda {
+  id                          Int      @id @default(autoincrement())
+  loja_idloja                 Int
+  departamento_iddepartamento String   @db.VarChar(2)
+  chassi                      String?  @db.VarChar(17)
+  nro_proposta                Int?
+  empresa_origem_proposta     Int?
+  revenda_origem_proposta     Int?
+  chave_proposta_loja_dms     String   @db.VarChar(50)
+  id_usuario_dms              Int?
+  nome_usuario_dms            String?  @db.VarChar(100)
+  cpf_usuario_dms             BigInt?
+  departamento_usuario_dms    Int?
+  time_venda_dms              Int?
+  nome_time_venda_dms         String?  @db.VarChar(100)
+  status_a_faturar            String?  @db.VarChar(20)
+  veiculo_capturado           String?  @db.VarChar(100)
+  valor_sinal                 Decimal? @default(0) @db.Decimal(10, 2)
+  valor_compra                Decimal? @default(0) @db.Decimal(10, 2)
+  correcao_faturamento        Decimal? @default(0) @db.Decimal(10, 2)
+  bonus                       Decimal? @default(0) @db.Decimal(10, 2)
+  outros_bonus                Decimal? @default(0) @db.Decimal(10, 2)
+  bonus_complementar          Decimal? @default(0) @db.Decimal(10, 2)
+  tipo_bonus_complementar     String?  @db.VarChar(30)
+  acessorios                  Decimal? @default(0) @db.Decimal(10, 2)
+  acessorios_nf               Decimal? @default(0) @db.Decimal(10, 2)
+  outros_nf                   Decimal? @default(0) @db.Decimal(10, 2)
+  brinde                      Decimal? @default(0) @db.Decimal(10, 2)
+  valor_financiado            Decimal? @default(0) @db.Decimal(10, 2)
+  banco                       String?  @db.VarChar(50)
+  valor_consorcio             Decimal? @default(0) @db.Decimal(10, 2)
+  consorcio                   String?  @db.VarChar(50)
+  tabela                      Int?
+  despachante                 Decimal? @default(0) @db.Decimal(10, 2)
+  seguro                      Decimal? @default(0) @db.Decimal(10, 2)
+  despesas_vendas             Decimal? @default(0) @db.Decimal(10, 2)
+  plus_antecipado             Decimal? @default(0) @db.Decimal(10, 2)
+  top                         Decimal? @default(0) @db.Decimal(10, 2)
+  devolucao                   Boolean  @default(false)
+  a_faturar_premium           Json?
+  historico                   Json?
+  created_at                  DateTime @default(now())
+
+  @@unique([loja_idloja, departamento_iddepartamento, nro_proposta, id_usuario_dms, devolucao])
+  @@index([loja_idloja])
+  @@index([loja_idloja, departamento_iddepartamento])
+  @@index([chave_proposta_loja_dms])
+  @@map("rvd_venda")
+}

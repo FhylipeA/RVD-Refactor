@@ -1,0 +1,338 @@
+<div class="dialog-container">
+
+  <!-- HEADER -->
+  <div class="dialog-header">
+    <div class="dialog-header-info">
+      <div class="dialog-title-row">
+        <h2 class="dialog-title">Informações da Venda</h2>
+        <span class="badge" [ngClass]="getStatusClass()">
+          {{ getStatusLabel() }}
+        </span>
+      </div>
+      <div class="dialog-meta">
+        <div class="meta-item">
+          <mat-icon>fingerprint</mat-icon>
+          <span class="meta-label">Chassi:</span>
+          <span class="meta-value">{{ venda.chassi }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>description</mat-icon>
+          <span class="meta-label">Proposta:</span>
+          <span class="meta-value">#{{ venda.nro_proposta }}</span>
+        </div>
+        <div class="meta-item">
+          <mat-icon>person</mat-icon>
+          <span class="meta-label">Vendedor:</span>
+          <span class="meta-value">{{ venda.nome_usuario_dms }}</span>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button (click)="fechar()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- TABS -->
+  <mat-tab-group [(selectedIndex)]="abaAtiva" animationDuration="200ms"
+    class="dialog-tabs">
+
+    <!-- TAB: DETALHES -->
+    <mat-tab label="Detalhes">
+      <div class="tab-content">
+
+        <!-- Info do modelo -->
+        <div class="modelo-section">
+          <div class="modelo-info">
+            <span class="modelo-label">Modelo</span>
+            <h3 class="modelo-nome">
+              {{ maisInfo?.modelo ?? 'Não informado' }}
+            </h3>
+            <div class="modelo-valores">
+              @if (maisInfo?.valorNotaVenda) {
+                <div class="valor-card">
+                  <span class="valor-label">Valor da Venda</span>
+                  <span class="valor-numero">
+                    {{ maisInfo?.valorNotaVenda | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              }
+              @if (maisInfo?.valorNfFabrica) {
+                <div class="valor-card valor-card--accent">
+                  <span class="valor-label">NF Fábrica</span>
+                  <span class="valor-numero">
+                    {{ maisInfo?.valorNfFabrica | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela de dados DMS -->
+        <div class="section">
+          <div class="section-header">
+            <h4 class="section-title">Dados do DMS</h4>
+            @if (maisInfo?.dtaAberturaProposta) {
+              <span class="section-sub">
+                Abertura: {{ maisInfo?.dtaAberturaProposta }}
+              </span>
+            }
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Cliente</span>
+              <span class="info-value">{{ maisInfo?.nomeCliente ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Status DMS</span>
+              <span class="info-value">{{ maisInfo?.status ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Dias até Faturar</span>
+              <span class="info-value">{{ maisInfo?.diasAteFaturar ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Dias em Estoque</span>
+              <span class="info-value">{{ maisInfo?.diasEstoque ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Nº NF</span>
+              <span class="info-value">{{ maisInfo?.nfNo ?? '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">ID Vendedor DMS</span>
+              <span class="info-value">{{ venda.id_usuario_dms ?? '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <!-- TAB: HISTÓRICO -->
+    <mat-tab label="Histórico">
+      <div class="tab-content">
+        @if (historicoFiltrado().length === 0) {
+          <div class="empty-tab">
+            <mat-icon>history</mat-icon>
+            <span>Nenhuma modificação registrada</span>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="historicoFiltrado()" class="historico-table">
+
+              <ng-container matColumnDef="data">
+                <th mat-header-cell *matHeaderCellDef>Data</th>
+                <td mat-cell *matCellDef="let row">{{ row.data }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="usuario">
+                <th mat-header-cell *matHeaderCellDef>Usuário</th>
+                <td mat-cell *matCellDef="let row">{{ row.usuario }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="valor_sinal">
+                <th mat-header-cell *matHeaderCellDef>Sinal</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'valor_sinal')">
+                  {{ row.descricao.valor_sinal }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="banco">
+                <th mat-header-cell *matHeaderCellDef>Banco</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'banco')">
+                  {{ row.descricao.banco ?? '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="bonus">
+                <th mat-header-cell *matHeaderCellDef>Bônus</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'bonus')">
+                  {{ row.descricao.bonus }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="outros_bonus">
+                <th mat-header-cell *matHeaderCellDef>Outros Bônus</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'outros_bonus')">
+                  {{ row.descricao.outros_bonus }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="brinde">
+                <th mat-header-cell *matHeaderCellDef>Brinde</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'brinde')">
+                  {{ row.descricao.brinde }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="seguro">
+                <th mat-header-cell *matHeaderCellDef>Seguro</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'seguro')">
+                  {{ row.descricao.seguro }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="tabela">
+                <th mat-header-cell *matHeaderCellDef>Tabela</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'tabela')">
+                  {{ row.descricao.tabela ?? '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="consorcio">
+                <th mat-header-cell *matHeaderCellDef>Consórcio</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'consorcio')">
+                  {{ row.descricao.consorcio ?? '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="despachante">
+                <th mat-header-cell *matHeaderCellDef>Despachante</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'despachante')">
+                  {{ row.descricao.despachante }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acessorios_nf">
+                <th mat-header-cell *matHeaderCellDef>Acess. NF</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'acessorios_nf')">
+                  {{ row.descricao.acessorios_nf }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="valor_financiado">
+                <th mat-header-cell *matHeaderCellDef>Vl. Financiado</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'valor_financiado')">
+                  {{ row.descricao.valor_financiado }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="veiculo_capturado">
+                <th mat-header-cell *matHeaderCellDef>Veículo Cap.</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'veiculo_capturado')">
+                  {{ row.descricao.veiculo_capturado ?? '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="correcao_faturamento">
+                <th mat-header-cell *matHeaderCellDef>Correção Fat.</th>
+                <td mat-cell *matCellDef="let row"
+                  [class.cell-changed]="isModificado(row, 'correcao_faturamento')">
+                  {{ row.descricao.correcao_faturamento }}
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="colunasHistorico; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: colunasHistorico;"></tr>
+            </table>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- TAB: PREMIUM -->
+    @if (data.enableAFaturarPremium) {
+      <mat-tab label="Premium">
+        <div class="tab-content">
+          @if (!dadosPremium()) {
+            <div class="empty-tab">
+              <mat-icon>stars</mat-icon>
+              <span>Nenhum dado premium cadastrado</span>
+              <button mat-flat-button class="btn-add-premium"
+                (click)="abrirEdicaoPremium()">
+                <mat-icon>add</mat-icon>
+                Cadastrar dados premium
+              </button>
+            </div>
+          } @else {
+            <div class="premium-section">
+              <div class="section-header">
+                <h4 class="section-title">Dados Premium</h4>
+                <button mat-stroked-button (click)="abrirEdicaoPremium()">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Data Venda</span>
+                  <span class="info-value">{{ dadosPremium()?.dta_venda ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Data NF</span>
+                  <span class="info-value">{{ dadosPremium()?.dta_nf ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Tipo Veículo</span>
+                  <span class="info-value">{{ dadosPremium()?.tipo_veiculo ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Entrada Estoque</span>
+                  <span class="info-value">{{ dadosPremium()?.dta_entrada_estoque ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Nº NF</span>
+                  <span class="info-value">{{ dadosPremium()?.nf_nro ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Pedido</span>
+                  <span class="info-value">{{ dadosPremium()?.pedido ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Modelo</span>
+                  <span class="info-value">{{ dadosPremium()?.modelo ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Tipo Venda</span>
+                  <span class="info-value">{{ dadosPremium()?.tipo_venda ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Local Venda</span>
+                  <span class="info-value">{{ dadosPremium()?.local_venda ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Cliente</span>
+                  <span class="info-value">{{ dadosPremium()?.cliente ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Valor Nota Venda</span>
+                  <span class="info-value valor-destaque">
+                    {{ dadosPremium()?.valor_nota_venda | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Valor NF Fábrica</span>
+                  <span class="info-value">
+                    {{ dadosPremium()?.valor_nf_fabrica | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    }
+
+  </mat-tab-group>
+
+  <!-- FOOTER -->
+  <div class="dialog-footer">
+    <button mat-button (click)="fechar()" class="btn-fechar">
+      Fechar
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,318 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px 20px;
+  background: var(--surface-container-low);
+  border-bottom: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dialog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--on-surface-variant);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta-value {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.close-btn {
+  color: var(--on-surface-variant) !important;
+  flex-shrink: 0;
+}
+
+// ============================================================
+// TABS
+// ============================================================
+.dialog-tabs {
+  flex: 1;
+  overflow: hidden;
+
+  ::ng-deep {
+    .mat-mdc-tab-header {
+      background: var(--surface-container-low);
+      border-bottom: 1px solid rgba(198, 197, 212, 0.15);
+      padding: 0 28px;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-body-content {
+      overflow: hidden;
+    }
+  }
+}
+
+.tab-content {
+  padding: 24px 28px;
+  height: 100%;
+  overflow-y: auto;
+  max-height: 420px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+  }
+}
+
+// ============================================================
+// MODELO SECTION
+// ============================================================
+.modelo-section {
+  margin-bottom: 24px;
+}
+
+.modelo-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.modelo-nome {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--on-surface);
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+}
+
+.modelo-valores {
+  display: flex;
+  gap: 12px;
+}
+
+.valor-card {
+  background: var(--surface-container-low);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  flex: 1;
+
+  &--accent {
+    background: rgba(0, 6, 102, 0.06);
+  }
+}
+
+.valor-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface-variant);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.valor-numero {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+// ============================================================
+// SECTION
+// ============================================================
+.section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.section-sub {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+}
+
+// ============================================================
+// INFO GRID
+// ============================================================
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface);
+
+  &.valor-destaque {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 15px;
+  }
+}
+
+// ============================================================
+// HISTÓRICO TABLE
+// ============================================================
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(198, 197, 212, 0.15);
+
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+  }
+}
+
+.historico-table {
+  width: 100%;
+  min-width: 900px;
+
+  .cell-changed {
+    color: var(--color-warning) !important;
+    font-weight: 700 !important;
+    background: rgba(245, 158, 11, 0.08) !important;
+  }
+}
+
+// ============================================================
+// EMPTY STATE
+// ============================================================
+.empty-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+  color: var(--on-surface-variant);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.4;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.btn-add-premium {
+  background: var(--primary) !important;
+  color: white !important;
+  margin-top: 8px !important;
+  border-radius: var(--radius-md) !important;
+}
+
+// ============================================================
+// PREMIUM SECTION
+// ============================================================
+.premium-section {
+  .section-header {
+    margin-bottom: 20px;
+  }
+}
+
+// ============================================================
+// FOOTER
+// ============================================================
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 28px;
+  background: var(--surface-container-high);
+  border-top: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.btn-fechar {
+  color: var(--on-surface-variant) !important;
+  font-weight: 600 !important;
+}

@@ -1,0 +1,228 @@
+<div class="dialog-container">
+
+  <!-- HEADER -->
+  <div class="dialog-header">
+    <div>
+      <h2 class="dialog-title">
+        {{ isEditMode ? 'Editar Cadastro Premium' : 'Cadastro Premium' }}
+      </h2>
+      <p class="dialog-subtitle">
+        Insira as informações detalhadas para registro de venda
+      </p>
+    </div>
+    <button mat-icon-button (click)="fechar()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- FORM -->
+  <form [formGroup]="form" class="dialog-form">
+
+    <div class="form-grid">
+
+      <!-- Chassi -->
+      <div class="form-field" [class.field-valid]="isFieldValid('chassi')"
+        [class.field-invalid]="isFieldInvalid('chassi')">
+        <label class="field-label">Chassi *</label>
+        <div class="input-wrapper">
+          <input class="field-input" formControlName="chassi"
+            placeholder="Digite o chassi (17 caracteres)"
+            maxlength="17">
+          @if (isFieldValid('chassi')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+          @if (isFieldInvalid('chassi')) {
+            <mat-icon class="field-icon field-icon--invalid">error</mat-icon>
+          }
+        </div>
+        @if (getFieldError('chassi')) {
+          <span class="field-error">{{ getFieldError('chassi') }}</span>
+        }
+      </div>
+
+      <!-- Tipo de Veículo -->
+      <div class="form-field">
+        <label class="field-label">Tipo de Veículo *</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn"
+            [class.toggle-btn--active]="form.get('tipo_veiculo')?.value === 'CARRO'"
+            (click)="form.get('tipo_veiculo')?.setValue('CARRO')">
+            <mat-icon>directions_car</mat-icon>
+            Carro
+          </button>
+          <button type="button" class="toggle-btn"
+            [class.toggle-btn--active]="form.get('tipo_veiculo')?.value === 'MOTO'"
+            (click)="form.get('tipo_veiculo')?.setValue('MOTO')">
+            <mat-icon>two_wheeler</mat-icon>
+            Moto
+          </button>
+        </div>
+      </div>
+
+      <!-- Consultor de Vendas -->
+      <div class="form-field" [class.field-valid]="isFieldValid('vendedor')"
+        [class.field-invalid]="isFieldInvalid('vendedor')">
+        <label class="field-label">Consultor de Vendas *</label>
+        <div class="input-wrapper">
+          <mat-select class="field-select" formControlName="vendedor"
+            placeholder="Selecione o vendedor">
+            @for (v of vendedores(); track v.idVendedor) {
+              <mat-option [value]="v">{{ v.nome }}</mat-option>
+            }
+          </mat-select>
+          @if (isFieldValid('vendedor')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+        </div>
+        @if (getFieldError('vendedor')) {
+          <span class="field-error">{{ getFieldError('vendedor') }}</span>
+        }
+      </div>
+
+      <!-- Nome do Cliente -->
+      <div class="form-field" [class.field-valid]="isFieldValid('cliente')"
+        [class.field-invalid]="isFieldInvalid('cliente')">
+        <label class="field-label">Nome do Cliente *</label>
+        <div class="input-wrapper">
+          <input class="field-input" formControlName="cliente"
+            placeholder="Nome completo do cliente">
+          @if (isFieldValid('cliente')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+          @if (isFieldInvalid('cliente')) {
+            <mat-icon class="field-icon field-icon--invalid">error</mat-icon>
+          }
+        </div>
+        @if (getFieldError('cliente')) {
+          <span class="field-error">{{ getFieldError('cliente') }}</span>
+        }
+      </div>
+
+      <!-- Data da Venda -->
+      <div class="form-field" [class.field-valid]="isFieldValid('dta_venda')"
+        [class.field-invalid]="isFieldInvalid('dta_venda')">
+        <label class="field-label">Data da Venda *</label>
+        <div class="input-wrapper">
+          <input class="field-input" type="date" formControlName="dta_venda">
+          @if (isFieldValid('dta_venda')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+          @if (isFieldInvalid('dta_venda')) {
+            <mat-icon class="field-icon field-icon--invalid">error</mat-icon>
+          }
+        </div>
+        @if (getFieldError('dta_venda')) {
+          <span class="field-error">{{ getFieldError('dta_venda') }}</span>
+        }
+      </div>
+
+      <!-- Modelo / Versão -->
+      <div class="form-field" [class.field-valid]="isFieldValid('modelo')"
+        [class.field-invalid]="isFieldInvalid('modelo')">
+        <label class="field-label">Modelo / Versão *</label>
+        <div class="input-wrapper">
+          <input class="field-input" formControlName="modelo"
+            placeholder="Ex: VW Taos Highline 250 TSI">
+          @if (isFieldValid('modelo')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+          @if (isFieldInvalid('modelo')) {
+            <mat-icon class="field-icon field-icon--invalid">error</mat-icon>
+          }
+        </div>
+        @if (getFieldError('modelo')) {
+          <span class="field-error">{{ getFieldError('modelo') }}</span>
+        }
+      </div>
+
+      <!-- Data NF-e -->
+      <div class="form-field">
+        <label class="field-label">Data NF-e</label>
+        <div class="input-wrapper">
+          <input class="field-input" type="date" formControlName="dta_nf">
+        </div>
+      </div>
+
+      <!-- Tipo de Venda -->
+      <div class="form-field">
+        <label class="field-label">Tipo de Venda</label>
+        <div class="input-wrapper">
+          <input class="field-input" formControlName="tipo_venda"
+            placeholder="Ex: Venda Direta Fábrica">
+        </div>
+      </div>
+
+      <!-- Entrada em Estoque -->
+      <div class="form-field" [class.field-invalid]="isFieldInvalid('dta_entrada_estoque')">
+        <label class="field-label">Entrada em Estoque</label>
+        <div class="input-wrapper">
+          <input class="field-input" type="date" formControlName="dta_entrada_estoque">
+        </div>
+      </div>
+
+      <!-- Local de Venda -->
+      <div class="form-field">
+        <label class="field-label">Local de Venda</label>
+        <div class="input-wrapper">
+          <input class="field-input" formControlName="local_venda"
+            placeholder="Ex: Showroom Principal">
+        </div>
+      </div>
+
+      <!-- Valor da Venda -->
+      <div class="form-field" [class.field-valid]="isFieldValid('valor_nota_venda')"
+        [class.field-invalid]="isFieldInvalid('valor_nota_venda')">
+        <label class="field-label">Valor da Venda (BRL) *</label>
+        <div class="input-wrapper input-wrapper--currency">
+          <span class="currency-prefix">R$</span>
+          <input class="field-input field-input--currency" type="number"
+            formControlName="valor_nota_venda"
+            placeholder="0,00" min="0" step="0.01">
+          @if (isFieldValid('valor_nota_venda')) {
+            <mat-icon class="field-icon field-icon--valid">check_circle</mat-icon>
+          }
+          @if (isFieldInvalid('valor_nota_venda')) {
+            <mat-icon class="field-icon field-icon--invalid">error</mat-icon>
+          }
+        </div>
+        @if (getFieldError('valor_nota_venda')) {
+          <span class="field-error">{{ getFieldError('valor_nota_venda') }}</span>
+        }
+      </div>
+
+      <!-- Valor NF Fábrica -->
+      <div class="form-field">
+        <label class="field-label">Valor NF Fábrica (BRL)</label>
+        <div class="input-wrapper input-wrapper--currency">
+          <span class="currency-prefix">R$</span>
+          <input class="field-input field-input--currency" type="number"
+            formControlName="valor_nf_fabrica"
+            placeholder="0,00" min="0" step="0.01">
+        </div>
+      </div>
+
+    </div>
+
+  </form>
+
+  <!-- FOOTER -->
+  <div class="dialog-footer">
+    <button type="button" mat-button (click)="fechar()" class="btn-cancelar">
+      Cancelar
+    </button>
+    <div class="footer-actions">
+      <button type="button" mat-flat-button class="btn-finalizar"
+        [disabled]="form.invalid || salvando()"
+        (click)="onSubmit()">
+        @if (salvando()) {
+          <mat-icon>hourglass_empty</mat-icon>
+          Salvando...
+        } @else {
+          <mat-icon>check</mat-icon>
+          {{ isEditMode ? 'Salvar Alterações' : 'Finalizar Cadastro' }}
+        }
+      </button>
+    </div>
+  </div>
+
+</div>

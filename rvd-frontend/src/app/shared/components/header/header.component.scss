@@ -1,0 +1,234 @@
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(198, 197, 212, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  gap: 16px;
+
+  :host-context(.dark) & {
+    background: rgba(15, 23, 42, 0.85);
+    border-bottom-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+// ============================================================
+// LEFT
+// ============================================================
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    color: white;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+  text-decoration: none;
+  cursor: pointer;
+  padding-bottom: 2px;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--primary);
+  }
+
+  &--active {
+    color: var(--primary);
+    font-weight: 700;
+    border-bottom: 2px solid var(--primary);
+  }
+}
+
+// ============================================================
+// CENTER
+// ============================================================
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+
+.header-field {
+  width: 160px;
+  margin: 0 !important;
+
+  &--data {
+    width: 140px;
+  }
+
+  ::ng-deep {
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+
+    .mdc-floating-label {
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+    }
+
+    .mdc-floating-label--float-above {
+      top: 0 !important;
+      transform: translateY(-50%) scale(0.75) !important;
+    }
+
+    .mat-mdc-text-field-wrapper {
+      height: 36px !important;
+      padding: 0 12px !important;
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 36px !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: var(--outline-variant) !important;
+    }
+
+    .mat-mdc-select-value,
+    input {
+      font-size: 13px !important;
+      color: var(--on-surface) !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding: 6px 0 !important;
+      min-height: unset !important;
+    }
+
+    label {
+      font-size: 11px !important;
+    }
+  }
+}
+
+.btn-buscar {
+  background: var(--primary) !important;
+  color: white !important;
+  height: 40px !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  padding: 0 16px !important;
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
+  }
+}
+
+// ============================================================
+// RIGHT
+// ============================================================
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  color: var(--on-surface-variant) !important;
+
+  &:hover {
+    background: var(--surface-container) !important;
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+  padding-left: 16px;
+  border-left: 1px solid var(--outline-variant);
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

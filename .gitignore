@@ -1,0 +1,15 @@
+# Backend
+rvd-api/node_modules/
+rvd-api/dist/
+rvd-api/.env
+
+# Frontend
+rvd-frontend/node_modules/
+rvd-frontend/dist/
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

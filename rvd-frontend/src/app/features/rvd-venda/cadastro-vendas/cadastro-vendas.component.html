@@ -1,0 +1,553 @@
+<div class="page-container">
+
+  <!-- CARDS DE RESUMO -->
+  @if (tabelaVisivel()) {
+  <div class="summary-cards">
+    <div class="summary-card" [class.summary-card--active]="filtros().statusAFaturar === ''"
+      (click)="aplicarFiltro('statusAFaturar', '')">
+      <div class="card-label">Vendas Totais</div>
+      <div class="card-value card-value--total">{{ vendas().length }}</div>
+      <div class="card-sub">todos os registros</div>
+    </div>
+
+    @for (item of dadosGrafico(); track item.nome) {
+    <div class="summary-card" [class.summary-card--active]="filtros().statusAFaturar === item.filtro"
+      (click)="aplicarFiltro('statusAFaturar', item.filtro)">
+      <div class="card-label">{{ item.nome }}</div>
+      <div class="card-value" [class.card-value--faturado]="item.filtro === 'REALIZADO'"
+        [class.card-value--pendente]="item.filtro === 'PENDENTE'"
+        [class.card-value--devolvido]="item.filtro === 'DEVOLVIDO'"
+        [class.card-value--negociando]="item.filtro === ''">
+        {{ item.valor }}
+      </div>
+      <div class="card-sub">
+        <span class="status-dot" [class.status-dot--faturado]="item.filtro === 'REALIZADO'"
+          [class.status-dot--pendente]="item.filtro === 'PENDENTE'"
+          [class.status-dot--devolvido]="item.filtro === 'DEVOLVIDO'"
+          [class.status-dot--negociando]="item.filtro === ''">
+        </span>
+        {{ vendas().length > 0 ? ((item.valor / vendas().length) * 100 | number:'1.0-0') + '% do total' : '—' }}
+      </div>
+      <div class="card-bar">
+        <div class="card-bar-fill" [class.card-bar-fill--faturado]="item.filtro === 'REALIZADO'"
+          [class.card-bar-fill--pendente]="item.filtro === 'PENDENTE'"
+          [class.card-bar-fill--devolvido]="item.filtro === 'DEVOLVIDO'"
+          [class.card-bar-fill--negociando]="item.filtro === ''"
+          [style.width.%]="vendas().length > 0 ? (item.valor / vendas().length) * 100 : 0">
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- FILTROS E AÇÕES -->
+  <div class="filtros-section">
+    <div class="filtros-esquerda">
+
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Status</mat-label>
+        <mat-select [value]="filtros().status" (selectionChange)="aplicarFiltro('status', $event.value)">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="FATURADO">Faturado</mat-option>
+          <mat-option value="A_FATURAR">A Faturar</mat-option>
+          <mat-option value="DEVOLVIDO">Devolvido</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Vendedor</mat-label>
+        <mat-select [value]="filtros().vendedor" (selectionChange)="aplicarFiltro('vendedor', $event.value)">
+          <mat-option value="">Todos</mat-option>
+          @for (v of vendedores(); track v) {
+          <mat-option [value]="v">{{ v }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filtro-busca">
+        <mat-label>Buscar universal</mat-label>
+        <input matInput (input)="aplicarFiltro('global', $any($event.target).value)">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+    </div>
+
+    <div class="filtros-direita">
+      @if (enableAFaturarPremium()) {
+      <button mat-flat-button class="btn-nova-venda" (click)="abrirDialogCadPremium()">
+        <mat-icon>add</mat-icon>
+        Nova Venda
+      </button>
+      }
+
+      @if (mostrarBotaoSalvar()) {
+      <button mat-flat-button class="btn-salvar" (click)="salvarAlteracoes()">
+        <mat-icon>save</mat-icon>
+        Salvar
+        <span class="badge-count">{{ totalModificacoes() }}</span>
+      </button>
+
+      <button mat-flat-button class="btn-descartar" (click)="descartarAlteracoes()">
+        Descartar
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- TABELA -->
+  <div class="table-container">
+
+    <!-- SKELETON -->
+    @if (carregando()) {
+    <div style="padding: 0">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+      <div class="skeleton skeleton-row"></div>
+      }
+    </div>
+    }
+
+    <!-- EMPTY STATE — sem loja selecionada -->
+    @if (!tabelaVisivel() && !carregando()) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>store</mat-icon>
+      </div>
+      <div class="empty-title">Selecione uma loja para começar</div>
+      <div class="empty-sub">
+        Escolha a loja, o departamento e o período para visualizar os registros de venda.
+      </div>
+    </div>
+    }
+
+    <!-- EMPTY STATE — sem dados -->
+    @if (tabelaVisivel() && !carregando() && vendasFiltradas().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <div class="empty-title">Nenhuma venda encontrada</div>
+      <div class="empty-sub">
+        Não encontramos vendas para os filtros selecionados.
+        Tente ajustar o período ou limpar os filtros.
+      </div>
+    </div>
+    }
+
+    <!-- TABELA DE DADOS -->
+    @if (tabelaVisivel() && !carregando() && vendasFiltradas().length > 0) {
+
+    <div class="table-header-actions">
+      <div class="table-nav">
+        <button mat-icon-button class="nav-btn" matTooltip="Rolar para esquerda" (click)="scrollTabela(-300)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button class="nav-btn" matTooltip="Rolar para direita" (click)="scrollTabela(300)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="vendasFiltradas()" class="rvd-table">
+
+        <!-- Info/Ações -->
+        <ng-container matColumnDef="info">
+          <th mat-header-cell *matHeaderCellDef class="col-info">Ações</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="row-actions">
+              <button mat-icon-button class="btn-info" matTooltip="Mais informações" (click)="abrirDialogInfo(row)">
+                <mat-icon>info</mat-icon>
+              </button>
+              <button mat-icon-button class="btn-reset" matTooltip="Limpar dados" (click)="resetarLinha(row)">
+                <mat-icon>restart_alt</mat-icon>
+              </button>
+              @if (row.a_faturar_premium) {
+              <button mat-icon-button class="btn-delete" matTooltip="Excluir registro" (click)="excluirRegistro(row)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Chassi -->
+        <ng-container matColumnDef="chassi">
+          <th mat-header-cell *matHeaderCellDef class="col-chassi">Chassi</th>
+          <td mat-cell *matCellDef="let row">
+            <span style="font-family: monospace; font-size: 12px; color: var(--primary)">
+              {{ row.chassi }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Proposta -->
+        <ng-container matColumnDef="nro_proposta">
+          <th mat-header-cell *matHeaderCellDef class="col-proposta">Proposta</th>
+          <td mat-cell *matCellDef="let row">{{ row.nro_proposta }}</td>
+        </ng-container>
+
+        <!-- Vendedor -->
+        <ng-container matColumnDef="nome_usuario_dms">
+          <th mat-header-cell *matHeaderCellDef class="col-vendedor">Vendedor</th>
+          <td mat-cell *matCellDef="let row">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div class="user-avatar" style="width: 26px; height: 26px; font-size: 9px">
+                {{ row.nome_usuario_dms?.substring(0,2)?.toUpperCase() }}
+              </div>
+              <span style="font-size: 12px">{{ row.nome_usuario_dms }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Cliente -->
+        <ng-container matColumnDef="nomeCliente">
+          <th mat-header-cell *matHeaderCellDef class="col-cliente">Cliente</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.maisInformacoes?.nomeCliente ?? '—' }}
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="col-status">Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge"
+              [class.badge--faturado]="row.status_a_faturar === 'REALIZADO'"
+              [class.badge--pendente]="row.status_a_faturar === 'PENDENTE'"
+              [class.badge--devolvido]="row.status_a_faturar === 'DEVOLVIDO'"
+              [class.badge--negociando]="!row.status_a_faturar">
+              {{ row.status_a_faturar === 'REALIZADO' ? 'Faturado' :
+                 row.status_a_faturar === 'PENDENTE' ? 'A Faturar' :
+                 row.status_a_faturar === 'DEVOLVIDO' ? 'Devolvido' : 'Negociando' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Status a faturar -->
+        <ng-container matColumnDef="status_a_faturar">
+          <th mat-header-cell *matHeaderCellDef class="col-faturamento">Faturamento</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 120px">
+              <mat-select [(ngModel)]="row.status_a_faturar" (selectionChange)="marcarModificado()">
+                <mat-option [value]="null">—</mat-option>
+                <mat-option value="PENDENTE">Pendente</mat-option>
+                <mat-option value="REALIZADO">Realizado</mat-option>
+                <mat-option value="DEVOLVIDO">Devolvido</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Valor sinal -->
+        <ng-container matColumnDef="valor_sinal">
+          <th mat-header-cell *matHeaderCellDef class="col-valor">Sinal</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 110px">
+              <input matInput type="number" [(ngModel)]="row.valor_sinal"
+                [title]="row.valor_sinal | brl"
+                (blur)="onBlurCampoNumerico(row, 'valor_sinal')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Valor compra -->
+        <ng-container matColumnDef="valor_compra">
+          <th mat-header-cell *matHeaderCellDef class="col-valor">Vl. Compra</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 110px">
+              <input matInput type="number" [(ngModel)]="row.valor_compra"
+                [title]="row.valor_compra | brl"
+                (blur)="onBlurCampoNumerico(row, 'valor_compra')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Veiculo capturado -->
+        <ng-container matColumnDef="veiculo_capturado">
+          <th mat-header-cell *matHeaderCellDef>Veículo Capturado</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 140px">
+              <input matInput [(ngModel)]="row.veiculo_capturado" (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Correção faturamento -->
+        <ng-container matColumnDef="correcao_faturamento">
+          <th mat-header-cell *matHeaderCellDef>Correção Fat.</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 110px">
+              <input matInput type="number" [(ngModel)]="row.correcao_faturamento"
+                [title]="row.correcao_faturamento | brl"
+                (blur)="onBlurCampoNumerico(row, 'correcao_faturamento')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Bonus -->
+        <ng-container matColumnDef="bonus">
+          <th mat-header-cell *matHeaderCellDef>Bônus</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.bonus"
+                [title]="row.bonus | brl"
+                (blur)="onBlurCampoNumerico(row, 'bonus')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Outros bonus -->
+        <ng-container matColumnDef="outros_bonus">
+          <th mat-header-cell *matHeaderCellDef>Outros Bônus</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.outros_bonus"
+                [title]="row.outros_bonus | brl"
+                (blur)="onBlurCampoNumerico(row, 'outros_bonus')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Bonus complementar (GM) -->
+        <ng-container matColumnDef="bonus_complementar">
+          <th mat-header-cell *matHeaderCellDef>Bônus Comp.</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.bonus_complementar"
+                [title]="row.bonus_complementar | brl"
+                (blur)="onBlurCampoNumerico(row, 'bonus_complementar')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Tipo bonus complementar (GM/NBS) -->
+        <ng-container matColumnDef="tipo_bonus_complementar">
+          <th mat-header-cell *matHeaderCellDef>Tipo Bônus</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 140px">
+              <mat-select [(ngModel)]="row.tipo_bonus_complementar" (selectionChange)="marcarModificado()">
+                @for (tipo of TIPOS_BONUS; track tipo) {
+                <mat-option [value]="tipo">{{ tipo ?? '—' }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Acessorios NF -->
+        <ng-container matColumnDef="acessorios_nf">
+          <th mat-header-cell *matHeaderCellDef>Acess. NF</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.acessorios_nf"
+                [title]="row.acessorios_nf | brl"
+                (blur)="onBlurCampoNumerico(row, 'acessorios_nf')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Outros NF -->
+        <ng-container matColumnDef="outros_nf">
+          <th mat-header-cell *matHeaderCellDef>Outros NF</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.outros_nf"
+                [title]="row.outros_nf | brl"
+                (blur)="onBlurCampoNumerico(row, 'outros_nf')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Brinde -->
+        <ng-container matColumnDef="brinde">
+          <th mat-header-cell *matHeaderCellDef>Brinde</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.brinde"
+                [title]="row.brinde | brl"
+                (blur)="onBlurCampoNumerico(row, 'brinde')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Valor financiado -->
+        <ng-container matColumnDef="valor_financiado">
+          <th mat-header-cell *matHeaderCellDef>Vl. Financiado</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 110px">
+              <input matInput type="number" [(ngModel)]="row.valor_financiado"
+                [title]="row.valor_financiado | brl"
+                (blur)="onBlurCampoNumerico(row, 'valor_financiado')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Banco -->
+        <ng-container matColumnDef="banco">
+          <th mat-header-cell *matHeaderCellDef>Banco</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 120px">
+              <mat-select [(ngModel)]="row.banco" (selectionChange)="marcarModificado()">
+                @for (banco of bancos(); track banco.nome) {
+                <mat-option [value]="banco.nome">
+                  {{ banco.nome ?? '—' }}
+                </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Valor consorcio -->
+        <ng-container matColumnDef="valor_consorcio">
+          <th mat-header-cell *matHeaderCellDef>Vl. Consórcio</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 110px">
+              <input matInput type="number" [(ngModel)]="row.valor_consorcio"
+                [title]="row.valor_consorcio | brl"
+                (blur)="onBlurCampoNumerico(row, 'valor_consorcio')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Consorcio -->
+        <ng-container matColumnDef="consorcio">
+          <th mat-header-cell *matHeaderCellDef>Consórcio</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 130px">
+              <mat-select [(ngModel)]="row.consorcio" (selectionChange)="marcarModificado()">
+                @for (c of consorcios(); track c.id) {
+                <mat-option [value]="c.consorcio">
+                  {{ c.consorcio ?? '—' }}
+                </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Tabela -->
+        <ng-container matColumnDef="tabela">
+          <th mat-header-cell *matHeaderCellDef>Tabela</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 90px">
+              <mat-select [(ngModel)]="row.tabela" (selectionChange)="marcarModificado()">
+                @for (t of TABELAS; track t) {
+                <mat-option [value]="t">{{ t ?? '—' }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Despachante -->
+        <ng-container matColumnDef="despachante">
+          <th mat-header-cell *matHeaderCellDef>Despachante</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.despachante"
+                [title]="row.despachante | brl"
+                (blur)="onBlurCampoNumerico(row, 'despachante')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Acessorios -->
+        <ng-container matColumnDef="acessorios">
+          <th mat-header-cell *matHeaderCellDef>Acessórios</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.acessorios"
+                [title]="row.acessorios | brl"
+                (blur)="onBlurCampoNumerico(row, 'acessorios')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Seguro -->
+        <ng-container matColumnDef="seguro">
+          <th mat-header-cell *matHeaderCellDef>Seguro</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.seguro"
+                [title]="row.seguro | brl"
+                (blur)="onBlurCampoNumerico(row, 'seguro')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Despesas vendas -->
+        <ng-container matColumnDef="despesas_vendas">
+          <th mat-header-cell *matHeaderCellDef>Desp. Vendas</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.despesas_vendas"
+                [title]="row.despesas_vendas | brl"
+                (blur)="onBlurCampoNumerico(row, 'despesas_vendas')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Plus antecipado -->
+        <ng-container matColumnDef="plus_antecipado">
+          <th mat-header-cell *matHeaderCellDef>Plus Antec.</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 100px">
+              <input matInput type="number" [(ngModel)]="row.plus_antecipado"
+                [title]="row.plus_antecipado | brl"
+                (blur)="onBlurCampoNumerico(row, 'plus_antecipado')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- TOP -->
+        <ng-container matColumnDef="top">
+          <th mat-header-cell *matHeaderCellDef>TOP</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="cell-input" style="width: 90px">
+              <input matInput type="number" [(ngModel)]="row.top"
+                [title]="row.top | brl"
+                (blur)="onBlurCampoNumerico(row, 'top')"
+                (input)="marcarModificado()">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns();"
+          [class.row-modified]="mostrarBotaoSalvar()">
+        </tr>
+      </table>
+    </div>
+
+    <!-- FOOTER DA TABELA -->
+    <div class="table-footer">
+      <span class="table-count">
+        Mostrando {{ vendasFiltradas().length }} de {{ vendas().length }} registros
+      </span>
+      <mat-paginator [length]="vendasFiltradas().length" [pageSize]="10" [pageSizeOptions]="[10, 25, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+    }
+
+  </div>
+
+</div>

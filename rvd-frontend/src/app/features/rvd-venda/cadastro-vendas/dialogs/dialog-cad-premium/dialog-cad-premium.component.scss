@@ -1,0 +1,257 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  width: 100%;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px 20px;
+  background: var(--surface-container-low);
+  border-bottom: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+
+.dialog-subtitle {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.close-btn {
+  color: var(--on-surface-variant) !important;
+  flex-shrink: 0;
+}
+
+// ============================================================
+// FORM
+// ============================================================
+.dialog-form {
+  padding: 24px 28px;
+  overflow-y: auto;
+  max-height: 520px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================
+// FORM FIELDS
+// ============================================================
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &--currency {
+    .currency-prefix {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+}
+
+.field-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 12px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color var(--transition-fast);
+
+  &:focus {
+    border-color: var(--primary);
+  }
+
+  &::placeholder {
+    color: var(--outline);
+  }
+
+  &--currency {
+    padding-left: 36px;
+  }
+
+  .field-valid & {
+    border-color: var(--color-success);
+    background: rgba(16, 185, 129, 0.04);
+  }
+
+  .field-invalid & {
+    border-color: var(--color-danger);
+    background: rgba(239, 68, 68, 0.04);
+  }
+}
+
+.field-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 12px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+
+  .field-valid & {
+    border-color: var(--color-success);
+  }
+}
+
+.field-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+
+  &--valid  { color: var(--color-success); }
+  &--invalid { color: var(--color-danger); }
+}
+
+.field-error {
+  font-size: 11px;
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+// ============================================================
+// TOGGLE GROUP (Tipo Veículo)
+// ============================================================
+.toggle-group {
+  display: flex;
+  gap: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &--active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+}
+
+// ============================================================
+// FOOTER
+// ============================================================
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  background: var(--surface-container-high);
+  border-top: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.btn-cancelar {
+  color: var(--on-surface-variant) !important;
+  font-weight: 600 !important;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-finalizar {
+  background: var(--primary) !important;
+  color: white !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 40px !important;
+  padding: 0 20px !important;
+  box-shadow: none !important;
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
+  }
+
+  &:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+}

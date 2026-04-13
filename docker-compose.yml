@@ -1,0 +1,29 @@
+services:
+  rvd-api:
+    build:
+      context: ./rvd-api
+      dockerfile: Dockerfile
+    container_name: rvd-api
+    restart: unless-stopped
+    env_file: ./rvd-api/.env
+    ports:
+      - "3000:3000"
+    networks:
+      - rvd-network
+
+  rvd-frontend:
+    build:
+      context: ./rvd-frontend
+      dockerfile: Dockerfile
+    container_name: rvd-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - rvd-api
+    networks:
+      - rvd-network
+
+networks:
+  rvd-network:
+    driver: bridge

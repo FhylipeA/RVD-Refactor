@@ -1,0 +1,580 @@
+// ============================================================
+// LAYOUT PRINCIPAL
+// ============================================================
+.page-container {
+  min-height: 100vh;
+  background: var(--background);
+  padding: 24px;
+}
+
+// ============================================================
+// CARDS DE RESUMO
+// ============================================================
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.summary-card {
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-ambient);
+  cursor: pointer;
+  transition: transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-modal);
+  }
+
+  &--active {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--on-surface-variant);
+    margin-bottom: 8px;
+  }
+
+  .card-value {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+
+    &--total {
+      color: var(--primary);
+    }
+
+    &--faturado {
+      color: var(--color-success);
+    }
+
+    &--pendente {
+      color: var(--color-warning);
+    }
+
+    &--devolvido {
+      color: var(--color-danger);
+    }
+
+    &--negociando {
+      color: var(--on-surface-variant);
+    }
+  }
+
+  .card-sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--on-surface-variant);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--surface-container-high);
+    margin-top: 12px;
+    overflow: hidden;
+
+    .card-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width var(--transition-slow);
+
+      &--faturado {
+        background: var(--color-success);
+      }
+
+      &--pendente {
+        background: var(--color-warning);
+      }
+
+      &--devolvido {
+        background: var(--color-danger);
+      }
+
+      &--negociando {
+        background: var(--on-surface-variant);
+      }
+    }
+  }
+}
+
+// ============================================================
+// FILTROS
+// ============================================================
+.filtros-section {
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-ambient);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filtros-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filtros-direita {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filtro-field {
+  width: 180px;
+}
+
+.filtro-busca {
+  width: 260px;
+}
+
+// ============================================================
+// BOTÕES DE AÇÃO
+// ============================================================
+.btn-nova-venda {
+  background: var(--tertiary-fixed) !important;
+  color: var(--on-tertiary-fixed) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  box-shadow: none !important;
+  transition: filter var(--transition-fast) !important;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+}
+
+.btn-salvar {
+  background: var(--primary) !important;
+  color: var(--on-primary) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  box-shadow: none !important;
+
+  .badge-count {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-full);
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-left: 4px;
+  }
+}
+
+.btn-descartar {
+  background: var(--surface-container-high) !important;
+  color: var(--on-surface) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  height: 40px !important;
+  box-shadow: none !important;
+}
+
+// ============================================================
+// TABELA
+// ============================================================
+.table-container {
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-ambient);
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  position: relative;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+  }
+}
+
+.rvd-table {
+  width: 100%;
+  min-width: 1400px;
+
+  // Colunas fixas
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    &:nth-child(1),
+    // ações
+    &:nth-child(2),
+    // chassi
+    &:nth-child(3),
+    // proposta
+    &:nth-child(4),
+    // vendedor
+    &:nth-child(5),
+    // cliente
+    &:nth-child(6) // status
+
+      {
+      position: sticky;
+      background: var(--surface-container-lowest);
+      z-index: 2;
+    }
+
+    &:nth-child(1) {
+      left: 0px;
+      width: 90px;
+      min-width: 90px;
+    }
+
+    &:nth-child(2) {
+      left: 90px;
+      width: 150px;
+      min-width: 150px;
+    }
+
+    &:nth-child(3) {
+      left: 240px;
+      width: 90px;
+      min-width: 90px;
+    }
+
+    &:nth-child(4) {
+      left: 330px;
+      width: 140px;
+      min-width: 140px;
+    }
+
+    &:nth-child(5) {
+      left: 470px;
+      width: 140px;
+      min-width: 140px;
+    }
+
+    &:nth-child(6) {
+      left: 610px;
+      width: 110px;
+      min-width: 110px;
+      border-right: 1px solid rgba(198, 197, 212, 0.3);
+    }
+  }
+
+  .mat-mdc-header-cell {
+
+    &:nth-child(1),
+    &:nth-child(2),
+    &:nth-child(3),
+    &:nth-child(4),
+    &:nth-child(5),
+    &:nth-child(6) {
+      background: var(--surface-container-low) !important;
+      z-index: 3;
+    }
+  }
+
+  .mat-mdc-row {
+    height: 48px !important;
+    vertical-align: middle !important;
+  }
+
+  .mat-mdc-cell {
+    padding: 20px 8px 1px !important;
+    vertical-align: middle !important;
+  }
+}
+
+// Colunas fixas
+.col-info {
+  width: 100px;
+}
+
+.col-chassi {
+  width: 140px;
+}
+
+.col-proposta {
+  width: 100px;
+}
+
+.col-vendedor {
+  width: 140px;
+}
+
+.col-cliente {
+  width: 160px;
+}
+
+.col-status {
+  width: 110px;
+}
+
+.col-faturamento {
+  width: 120px;
+}
+
+.col-valor {
+  width: 120px;
+}
+
+// Células editáveis
+.cell-input {
+  .mat-mdc-form-field {
+    width: 100%;
+    margin-top: 2px;
+
+    ::ng-deep {
+      .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
+      }
+
+      .mat-mdc-text-field-wrapper {
+        padding: 0 6px !important;
+        height: 28px !important;
+      }
+
+      .mat-mdc-form-field-flex {
+        height: 28px !important;
+      }
+
+      .mat-mdc-form-field-infix {
+        padding: 2px 0 !important;
+        min-height: unset !important;
+      }
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: transparent !important;
+      }
+
+      &:hover,
+      &.mat-focused {
+
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--outline-variant) !important;
+        }
+      }
+
+      input {
+        font-size: 12px !important;
+        color: var(--on-surface) !important;
+      }
+
+      .mat-mdc-select-value-text {
+        font-size: 12px !important;
+      }
+    }
+  }
+}
+
+// Linha modificada
+.row-modified {
+  background: transparent !important;
+}
+
+// ============================================================
+// PAGINAÇÃO
+// ============================================================
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(198, 197, 212, 0.2);
+
+  .table-count {
+    font-size: 12px;
+    color: var(--on-surface-variant);
+    font-weight: 500;
+  }
+}
+
+.table-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 16px 8px;
+  background: var(--surface-container-lowest);
+  border-bottom: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.table-nav {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.nav-btn {
+  color: var(--primary) !important;
+  background: transparent !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &:first-child {
+    border-right: 1px solid var(--primary);
+  }
+
+  &:hover {
+    background: rgba(0, 6, 102, 0.08) !important;
+  }
+
+  ::ng-deep .mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+// ============================================================
+// EMPTY STATES
+// ============================================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--surface-container-high);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: var(--on-surface-variant);
+    }
+  }
+
+  .empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--on-surface);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    max-width: 360px;
+    line-height: 1.6;
+  }
+}
+
+// ============================================================
+// SKELETON LOADING
+// ============================================================
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--surface-container-high) 25%,
+      var(--surface-container) 50%,
+      var(--surface-container-high) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-row {
+  height: 52px;
+  margin-bottom: 1px;
+}
+
+// ============================================================
+// AÇÕES DA LINHA
+// ============================================================
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  button {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+
+    &.btn-info {
+      color: var(--primary) !important;
+    }
+
+    &.btn-reset {
+      color: var(--on-surface-variant) !important;
+    }
+
+    &.btn-delete {
+      color: var(--color-danger) !important;
+    }
+  }
+}

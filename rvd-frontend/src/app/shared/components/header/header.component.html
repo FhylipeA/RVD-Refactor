@@ -1,0 +1,80 @@
+<header class="app-header">
+  <div class="header-left">
+    <div class="brand">
+      <span class="brand-icon">
+        <mat-icon>directions_car</mat-icon>
+      </span>
+      <span class="brand-name">RVD Vendas</span>
+    </div>
+
+    <nav class="header-nav">
+      <a class="nav-link nav-link--active">Dashboard</a>
+      <a class="nav-link">Relatórios</a>
+    </nav>
+  </div>
+
+  <div class="header-center">
+    @if (lojas().length > 0) {
+      <mat-form-field appearance="outline" class="header-field">
+        <mat-label>Loja</mat-label>
+        <mat-select [value]="lojaSelecionada()"
+          (selectionChange)="onLojaChange($event.value)">
+          @for (loja of lojas(); track loja.idloja) {
+            <mat-option [value]="loja">{{ loja.nome }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (lojaSelecionada()) {
+      <mat-form-field appearance="outline" class="header-field">
+        <mat-label>Departamento</mat-label>
+        <mat-select [value]="departamentoSelecionado()"
+          (selectionChange)="onDepartamentoChange($event.value)">
+          @for (dep of departamentos; track dep.departamento_iddepartamento) {
+            <mat-option [value]="dep.departamento_iddepartamento">
+              {{ dep.descricao_departamento }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (departamentoSelecionado()) {
+      <mat-form-field appearance="outline" class="header-field header-field--data">
+        <mat-label>Mês e Ano</mat-label>
+        <input matInput [matDatepicker]="picker"
+          [value]="dataSelecionada()"
+          (dateChange)="onDataChange($event.value)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker startView="multi-year"></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-flat-button class="btn-buscar" (click)="onBuscar()">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+    }
+  </div>
+
+  <div class="header-right">
+    <button mat-icon-button
+      [matTooltip]="isDarkMode() ? 'Modo claro' : 'Modo escuro'"
+      (click)="onToggleDarkMode()"
+      class="icon-btn">
+      <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    <button mat-icon-button class="icon-btn" matTooltip="Notificações">
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <div class="user-info">
+      <div class="user-avatar">{{ getUserInitials() }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ getUserName() }}</span>
+        <span class="user-role">{{ getUserRole() }}</span>
+      </div>
+    </div>
+  </div>
+</header>
