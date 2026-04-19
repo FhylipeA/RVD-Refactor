@@ -20,6 +20,7 @@ export interface Integracao {
   tipo_integracao_idtipo_integracao: number;
   ativo: boolean;
   loja_nome_bandeira: string;
+  dePara_LinxDms: string;
 }
 
 export interface MaisInformacoes {

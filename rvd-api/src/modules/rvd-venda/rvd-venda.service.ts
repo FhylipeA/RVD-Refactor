@@ -222,4 +222,18 @@ export class RvdVendaService {
       valorNotaVenda: premium?.valor_nota_venda ?? null,
     };
   }
+
+  async findByStoreAndChassis(
+    loja_idloja: number,
+    chassisList: string[],
+  ) {
+    if (!chassisList.length) return [];
+    return this.prisma.rvdVenda.findMany({
+      where: {
+        loja_idloja,
+        chassi: { in: chassisList },
+      },
+      orderBy: { created_at: 'asc' },
+    });
+  }
 }

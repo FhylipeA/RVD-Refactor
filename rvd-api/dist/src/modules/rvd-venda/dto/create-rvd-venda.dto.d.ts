@@ -1,0 +1,68 @@
+import { z } from 'zod';
+export declare const CreateRvdVendaSchema: z.ZodObject<{
+    loja_idloja: z.ZodNumber;
+    departamento_iddepartamento: z.ZodString;
+    chassi: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    nro_proposta: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    empresa_origem_proposta: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    revenda_origem_proposta: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    chave_proposta_loja_dms: z.ZodString;
+    id_usuario_dms: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    nome_usuario_dms: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    cpf_usuario_dms: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    departamento_usuario_dms: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    time_venda_dms: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    nome_time_venda_dms: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    status_a_faturar: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        REALIZADO: "REALIZADO";
+        PENDENTE: "PENDENTE";
+        DEVOLVIDO: "DEVOLVIDO";
+    }>>>;
+    veiculo_capturado: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    valor_sinal: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    valor_compra: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    correcao_faturamento: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    bonus: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    outros_bonus: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    bonus_complementar: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    tipo_bonus_complementar: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    acessorios: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    acessorios_nf: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    outros_nf: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    brinde: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    valor_financiado: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    banco: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    valor_consorcio: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    consorcio: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    tabela: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    despachante: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    seguro: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    despesas_vendas: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    plus_antecipado: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    top: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    devolucao: z.ZodDefault<z.ZodBoolean>;
+    a_faturar_premium: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        dta_venda: z.ZodString;
+        dta_nf: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        tipo_veiculo: z.ZodEnum<{
+            CARRO: "CARRO";
+            MOTO: "MOTO";
+        }>;
+        dta_entrada_estoque: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        venda_nro: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        nf_nro: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        pedido: z.ZodString;
+        cliente: z.ZodString;
+        modelo: z.ZodString;
+        tipo_venda: z.ZodString;
+        local_venda: z.ZodString;
+        valor_nota_venda: z.ZodNumber;
+        valor_nf_fabrica: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$strip>>>;
+    historico: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+        data: z.ZodString;
+        usuario: z.ZodString;
+        descricao: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    }, z.core.$strip>>>>;
+}, z.core.$strip>;
+export type CreateRvdVendaDto = z.infer<typeof CreateRvdVendaSchema>;

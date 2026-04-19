@@ -1,15 +1,29 @@
-# Backend
-rvd-api/node_modules/
-rvd-api/dist/
-rvd-api/.env
+services:
+  rvd-api:
+    build:
+      context: ./rvd-api
+      dockerfile: Dockerfile
+    container_name: rvd-api
+    restart: unless-stopped
+    env_file: ./rvd-api/.env.docker
+    ports:
+      - "3000:3000"
+    networks:
+      - rvd-network
 
-# Frontend
-rvd-frontend/node_modules/
-rvd-frontend/dist/
+  rvd-frontend:
+    build:
+      context: ./rvd-frontend
+      dockerfile: Dockerfile
+    container_name: rvd-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - rvd-api
+    networks:
+      - rvd-network
 
-# Docker
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
+networks:
+  rvd-network:
+    driver: bridge

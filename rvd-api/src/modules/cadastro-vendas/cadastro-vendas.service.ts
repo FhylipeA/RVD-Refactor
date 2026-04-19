@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RvdVendaService } from '../rvd-venda/rvd-venda.service';
-import { RvdVenda } from '../rvd-venda/entities/rvd-venda.entity';
-import { CreateRvdVendaDto } from '../rvd-venda/dto/create-rvd-venda.dto';
-import { Integracao, MaisInformacoes } from './cadastro-vendas.interface';
-import * as _ from 'lodash';
+import { IntegradorDmsNbsService } from '../integrador-dms-nbs/integrador-dms-nbs.service';
+import type { CreateRvdVendaDto } from '../rvd-venda/dto/create-rvd-venda.dto';
+import type { Integracao } from './cadastro-vendas.interface';
 
 @Injectable()
 export class CadastroVendasService {
@@ -11,6 +10,7 @@ export class CadastroVendasService {
 
   constructor(
     private readonly rvdVendaService: RvdVendaService,
+    private readonly integradorNbs: IntegradorDmsNbsService,
   ) {}
 
   validaAFaturarPremium(integracao: Integracao): boolean {
@@ -33,60 +33,104 @@ export class CadastroVendasService {
   ): Promise<{ response: any[]; enableAFaturarPremium: boolean }> {
     try {
       const enableAFaturarPremium = this.validaAFaturarPremium(integracao);
+      const codEmpresa = integracao.dePara_LinxDms;
       const departamento = integracao.departamento_iddepartamento;
 
-      const getRvdVendaByStore = await this.rvdVendaService.findByStore(idLoja);
-      const searchPropostasDevolvidas = await this.rvdVendaService.findReturned(
-        idLoja,
-        departamento,
-      );
+      // Busca paralela no Oracle NBS
+      const [faturadas, aFaturar, devolvidas] = await Promise.all([
+        this.integradorNbs.getVendasFaturadas(codEmpresa, periodo),
+        this.integradorNbs.getVendasAFaturar(codEmpresa, periodo),
+        this.integradorNbs.getPropostasDevolvidas(codEmpresa, periodo),
+      ]);
 
-      let searchVeiculosRvdVenda = await this.rvdVendaService.findByFilters(
-        idLoja,
-        departamento,
-        getRvdVendaByStore.map(v => v.nro_proposta).filter(Boolean) as number[],
-        enableAFaturarPremium,
-      );
+      const todasVendasNbs = [...faturadas, ...aFaturar, ...devolvidas];
 
-      if (enableAFaturarPremium) {
-        const manuais = await this.rvdVendaService.findManualByStorePeriodAndDepartment(
-          idLoja,
-          periodo,
-          departamento,
-        );
-
-        const todos = [...searchVeiculosRvdVenda, ...manuais];
-        const unicos = Array.from(
-          new Map(todos.map(v => [v.id, v])).values()
-        );
-        searchVeiculosRvdVenda = unicos;
+      if (!todasVendasNbs.length) {
+        return { response: [], enableAFaturarPremium };
       }
 
-      const resultado = searchVeiculosRvdVenda.map(proposta => {
-        const premium = proposta.a_faturar_premium as any;
-        const maisInformacoes: MaisInformacoes = {
-          dtaAberturaProposta: null,
-          modelo: premium?.modelo ?? null,
-          status:
-            proposta.status_a_faturar === 'REALIZADO'
-              ? 'FATURADO'
-              : proposta.status_a_faturar === 'DEVOLVIDO'
-              ? 'DEVOLVIDO'
-              : 'A_FATURAR',
-          nomeCliente: premium?.cliente ?? null,
-          nomeVendedor: proposta.nome_usuario_dms ?? null,
-          idVendedor: proposta.id_usuario_dms ?? null,
-          diasEstoque: null,
-          diasAteFaturar: null,
-          nfNo: null,
-          valorNfFabrica: premium?.valor_nf_fabrica ?? null,
-          valorNotaVenda: premium?.valor_nota_venda ?? null,
+      // Busca registros RVD existentes no banco local
+      const chassisList = todasVendasNbs
+        .map(v => v.chassi)
+        .filter(Boolean) as string[];
+
+      const rvdExistentes = await this.rvdVendaService.findByStoreAndChassis(
+        idLoja,
+        chassisList,
+      );
+
+      // Monta mapa de RVD por chassi para merge rápido
+      const rvdMap = new Map(
+        rvdExistentes.map(r => [r.chassi, r]),
+      );
+
+      // Merge: dados do DMS + dados editáveis do RVD
+      const response = todasVendasNbs.map(venda => {
+        const rvd = rvdMap.get(venda.chassi ?? '') ?? null;
+
+        const maisInformacoes = {
+          dtaAberturaProposta: venda.dtaAberturaProposta ?? null,
+          modelo: venda.modelo ?? null,
+          status: venda.status,
+          nomeCliente: venda.nomeCliente ?? null,
+          nomeVendedor: venda.nomeVendedor ?? null,
+          idVendedor: venda.idVendedor ?? null,
+          diasEstoque: venda.diasEstoque ?? null,
+          diasAteFaturar: venda.diasAteFaturar ?? null,
+          nfNo: venda.nfNo ?? null,
+          valorNfFabrica: venda.valorNfFabrica ?? null,
+          valorNotaVenda: venda.valorNotaVenda ?? null,
         };
 
-        return { ...proposta, maisInformacoes };
+        return {
+          // Dados base do DMS
+          loja_idloja: idLoja,
+          departamento_iddepartamento: departamento,
+          chassi: venda.chassi,
+          nro_proposta: venda.proposta,
+          chave_proposta_loja_dms: venda.proposta
+            ? String(venda.proposta)
+            : venda.chassi,
+          id_usuario_dms: venda.idVendedor,
+          nome_usuario_dms: venda.nomeVendedor,
+          cpf_usuario_dms: venda.cpfVendedor,
+          departamento_usuario_dms: venda.departamentoVendedor,
+          time_venda_dms: venda.timeVenda,
+          nome_time_venda_dms: venda.desTimeVenda,
+          devolucao: venda.status === 'DEVOLVIDO',
+
+          // Dados editáveis do RVD (se existirem)
+          status_a_faturar: rvd?.status_a_faturar ?? null,
+          veiculo_capturado: rvd?.veiculo_capturado ?? null,
+          valor_sinal: rvd?.valor_sinal ?? 0,
+          valor_compra: rvd?.valor_compra ?? venda.valorNotaVenda ?? null,
+          correcao_faturamento: rvd?.correcao_faturamento ?? 0,
+          bonus: rvd?.bonus ?? 0,
+          outros_bonus: rvd?.outros_bonus ?? 0,
+          acessorios: rvd?.acessorios ?? 0,
+          valor_financiado: rvd?.valor_financiado ?? 0,
+          acessorios_nf: rvd?.acessorios_nf ?? 0,
+          outros_nf: rvd?.outros_nf ?? 0,
+          brinde: rvd?.brinde ?? 0,
+          banco: rvd?.banco ?? null,
+          valor_consorcio: rvd?.valor_consorcio ?? 0,
+          consorcio: rvd?.consorcio ?? null,
+          tabela: rvd?.tabela ?? null,
+          despachante: rvd?.despachante ?? 0,
+          seguro: rvd?.seguro ?? 0,
+          bonus_complementar: rvd?.bonus_complementar ?? 0,
+          despesas_vendas: rvd?.despesas_vendas ?? 0,
+          plus_antecipado: rvd?.plus_antecipado ?? 0,
+          top: rvd?.top ?? 0,
+          historico: rvd?.historico ?? null,
+          a_faturar_premium: rvd?.a_faturar_premium ?? null,
+
+          // Dados do DMS para exibição
+          maisInformacoes,
+        };
       });
 
-      return { response: resultado, enableAFaturarPremium };
+      return { response, enableAFaturarPremium };
     } catch (error) {
       this.logger.error('Erro em findVendasVeiculos:', error);
       throw error;
@@ -98,9 +142,14 @@ export class CadastroVendasService {
   }
 
   async getVendedoresBI(integracao: Integracao): Promise<any[]> {
-    // Retorna lista vazia por enquanto
-    // Quando integrar com DMS Linx/NBS, implementar aqui
-    return [];
+    try {
+      const codEmpresa = integracao.dePara_LinxDms;
+      const departamento = integracao.departamento_iddepartamento;
+      return await this.integradorNbs.getVendedores(codEmpresa, departamento);
+    } catch (error) {
+      this.logger.error('Erro em getVendedoresBI:', error);
+      return [];
+    }
   }
 
   async getBancos(): Promise<{ nome: string }[]> {

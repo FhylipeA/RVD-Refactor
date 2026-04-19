@@ -60,6 +60,7 @@ export class HeaderComponent implements OnInit {
             legado: 'APOLLO',
             loja_nome_bandeira: 'GM',
             departamento: 'Novos',
+            dePara_LinxDms: '1',
           }
         ]
       }
