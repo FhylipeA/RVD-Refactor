@@ -1,0 +1,221 @@
+<div class="config-container">
+
+  <div class="config-header">
+    <div>
+      <h1 class="config-title">Configuração de Lojas</h1>
+      <p class="config-subtitle">Gerencie as lojas e departamentos do sistema</p>
+    </div>
+    <button mat-flat-button class="btn-nova-loja" (click)="abrirFormLoja()">
+      <mat-icon>add</mat-icon>
+      Nova Loja
+    </button>
+  </div>
+
+  <!-- FORM NOVA/EDITAR LOJA -->
+  @if (mostrarFormLoja()) {
+  <div class="form-card">
+    <h3 class="form-title">
+      {{ lojaEditando() ? 'Editar Loja' : 'Nova Loja' }}
+    </h3>
+    <form [formGroup]="formLoja" class="form-grid">
+
+      <div class="form-field">
+        <label class="field-label">Nome da Loja *</label>
+        <input class="field-input" formControlName="nome" placeholder="Ex: Matriz Centro">
+        @if (formLoja.get('nome')?.invalid && formLoja.get('nome')?.touched) {
+          <span class="field-error">Campo obrigatório</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">COD_EMPRESA (DMS) *</label>
+        <input class="field-input" formControlName="dePara_LinxDms" placeholder="Ex: 1">
+        @if (formLoja.get('dePara_LinxDms')?.invalid && formLoja.get('dePara_LinxDms')?.touched) {
+          <span class="field-error">Campo obrigatório</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">Bandeira</label>
+        <mat-select class="field-select" formControlName="bandeira_idbandeira"
+          placeholder="Selecione a bandeira">
+          <mat-option [value]="null">—</mat-option>
+          @for (b of BANDEIRAS; track b.id) {
+            <mat-option [value]="b.id">{{ b.nome }}</mat-option>
+          }
+        </mat-select>
+      </div>
+
+    </form>
+
+    <div class="form-actions">
+      <button mat-button (click)="cancelarFormLoja()">Cancelar</button>
+      <button mat-flat-button class="btn-salvar" (click)="salvarLoja()">
+        <mat-icon>save</mat-icon>
+        {{ lojaEditando() ? 'Salvar' : 'Criar Loja' }}
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- LISTA DE LOJAS -->
+  @if (carregando()) {
+  <div class="loading">Carregando...</div>
+  } @else if (lojas().length === 0) {
+  <div class="empty-state">
+    <mat-icon>store</mat-icon>
+    <p>Nenhuma loja cadastrada</p>
+  </div>
+  } @else {
+  <mat-accordion class="lojas-accordion">
+    @for (loja of lojas(); track loja.idloja) {
+    <mat-expansion-panel class="loja-panel">
+
+      <mat-expansion-panel-header>
+        <mat-panel-title class="panel-title">
+          <mat-icon>store</mat-icon>
+          <span>{{ loja.nome }}</span>
+          <span class="loja-badge">{{ getBandeiraNome(loja.bandeira_idbandeira) }}</span>
+        </mat-panel-title>
+        <mat-panel-description class="panel-desc">
+          COD_EMPRESA: {{ loja.dePara_LinxDms }} ·
+          {{ loja.rvdVendas.length }} departamento(s)
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="loja-content">
+
+        <!-- Ações da loja -->
+        <div class="loja-actions">
+          <button mat-stroked-button (click)="abrirFormLoja(loja)">
+            <mat-icon>edit</mat-icon> Editar
+          </button>
+          <button mat-stroked-button class="btn-danger" (click)="removerLoja(loja)">
+            <mat-icon>delete</mat-icon> Remover
+          </button>
+        </div>
+
+        <!-- Departamentos -->
+        <div class="deps-section">
+          <div class="deps-header">
+            <h4 class="deps-title">Departamentos</h4>
+            <button mat-flat-button class="btn-add-dep"
+              (click)="abrirFormDep(loja.idloja)">
+              <mat-icon>add</mat-icon>
+              Adicionar
+            </button>
+          </div>
+
+          <!-- Form departamento -->
+          @if (mostrarFormDep() === loja.idloja) {
+          <div class="form-card form-card--dep">
+            <h4 class="form-title">
+              {{ depEditando() ? 'Editar Departamento' : 'Novo Departamento' }}
+            </h4>
+            <form [formGroup]="formDep" class="form-grid">
+
+              <div class="form-field">
+                <label class="field-label">Código *</label>
+                <input class="field-input" formControlName="departamento_iddepartamento"
+                  placeholder="Ex: N" maxlength="2">
+                @if (formDep.get('departamento_iddepartamento')?.invalid &&
+                  formDep.get('departamento_iddepartamento')?.touched) {
+                  <span class="field-error">Campo obrigatório (máx 2 chars)</span>
+                }
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Descrição *</label>
+                <input class="field-input" formControlName="descricao_departamento"
+                  placeholder="Ex: Novos">
+                @if (formDep.get('descricao_departamento')?.invalid &&
+                  formDep.get('descricao_departamento')?.touched) {
+                  <span class="field-error">Campo obrigatório</span>
+                }
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Legado *</label>
+                <mat-select class="field-select" formControlName="legado">
+                  @for (l of LEGADOS; track l) {
+                    <mat-option [value]="l">{{ l }}</mat-option>
+                  }
+                </mat-select>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Bandeira DMS</label>
+                <input class="field-input" formControlName="loja_nome_bandeira"
+                  placeholder="Ex: GM">
+              </div>
+
+            </form>
+            <div class="form-actions">
+              <button mat-button (click)="cancelarFormDep()">Cancelar</button>
+              <button mat-flat-button class="btn-salvar" (click)="salvarDep()">
+                <mat-icon>save</mat-icon>
+                Salvar
+              </button>
+            </div>
+          </div>
+          }
+
+          <!-- Lista departamentos -->
+          @if (loja.rvdVendas.length === 0) {
+          <p class="no-deps">Nenhum departamento cadastrado</p>
+          } @else {
+          <table mat-table [dataSource]="loja.rvdVendas" class="deps-table">
+
+            <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef>Código</th>
+              <td mat-cell *matCellDef="let dep">
+                <span class="dep-codigo">{{ dep.departamento_iddepartamento }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="descricao">
+              <th mat-header-cell *matHeaderCellDef>Descrição</th>
+              <td mat-cell *matCellDef="let dep">{{ dep.descricao_departamento }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="legado">
+              <th mat-header-cell *matHeaderCellDef>Legado</th>
+              <td mat-cell *matCellDef="let dep">{{ dep.legado }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="bandeira">
+              <th mat-header-cell *matHeaderCellDef>Bandeira DMS</th>
+              <td mat-cell *matCellDef="let dep">{{ dep.loja_nome_bandeira ?? '—' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let dep">
+                <div class="dep-actions">
+                  <button mat-icon-button matTooltip="Editar"
+                    (click)="abrirFormDep(loja.idloja, dep)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Remover" class="btn-icon-danger"
+                    (click)="removerDep(loja.idloja, dep)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['codigo','descricao','legado','bandeira','acoes']">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['codigo','descricao','legado','bandeira','acoes'];">
+            </tr>
+          </table>
+          }
+        </div>
+      </div>
+
+    </mat-expansion-panel>
+    }
+  </mat-accordion>
+  }
+
+</div>

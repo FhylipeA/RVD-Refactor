@@ -10,5 +10,10 @@ export const routes: Routes = [
     path: 'cadastro-vendas',
     loadChildren: () =>
       import('./features/rvd-venda/rvd-venda.module').then(m => m.RvdVendaModule)
+  },
+  {
+    path: 'configuracoes/lojas',
+    loadComponent: () =>
+      import('./features/configuracoes/lojas/lojas.component').then(m => m.LojasComponent)
   }
 ];

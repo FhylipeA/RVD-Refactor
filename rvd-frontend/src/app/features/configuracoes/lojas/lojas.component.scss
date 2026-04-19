@@ -1,0 +1,298 @@
+.config-container {
+    padding: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.config-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+}
+
+.config-subtitle {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    margin: 0;
+}
+
+.btn-nova-loja {
+    background: var(--primary) !important;
+    color: white !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+// ============================================================
+// FORM CARD
+// ============================================================
+.form-card {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(198, 197, 212, 0.15);
+
+    &--dep {
+        margin-top: 16px;
+        background: var(--surface-container);
+    }
+}
+
+.form-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--on-surface-variant);
+}
+
+.field-input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    background: var(--surface-container-lowest);
+    color: var(--on-surface);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color var(--transition-fast);
+
+    &:focus {
+        border-color: var(--primary);
+    }
+}
+
+.field-select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    background: var(--surface-container-lowest);
+    color: var(--on-surface);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.field-error {
+    font-size: 11px;
+    color: var(--color-danger);
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-salvar {
+    background: var(--primary) !important;
+    color: white !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+// ============================================================
+// ACCORDION
+// ============================================================
+.lojas-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.loja-panel {
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid rgba(198, 197, 212, 0.15) !important;
+    box-shadow: none !important;
+    background: var(--surface-container-low) !important;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--on-surface);
+
+    mat-icon {
+        color: var(--primary);
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.loja-badge {
+    background: var(--primary);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.panel-desc {
+    font-size: 12px;
+    color: var(--on-surface-variant);
+}
+
+// ============================================================
+// LOJA CONTENT
+// ============================================================
+.loja-content {
+    padding: 8px 0;
+}
+
+.loja-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.btn-danger {
+    color: var(--color-danger) !important;
+    border-color: var(--color-danger) !important;
+}
+
+// ============================================================
+// DEPARTAMENTOS
+// ============================================================
+.deps-section {
+    border-top: 1px solid rgba(198, 197, 212, 0.15);
+    padding-top: 16px;
+}
+
+.deps-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.deps-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+}
+
+.btn-add-dep {
+    background: var(--surface-container) !important;
+    color: var(--primary) !important;
+    border-radius: var(--radius-md) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    height: 32px !important;
+}
+
+.deps-table {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid rgba(198, 197, 212, 0.15);
+}
+
+.dep-codigo {
+    background: var(--surface-container);
+    color: var(--primary);
+    font-weight: 700;
+    font-family: monospace;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.dep-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.btn-icon-danger {
+    color: var(--color-danger) !important;
+}
+
+.no-deps {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    text-align: center;
+    padding: 16px;
+}
+
+// ============================================================
+// EMPTY / LOADING
+// ============================================================
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 48px;
+    color: var(--on-surface-variant);
+
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        opacity: 0.3;
+    }
+
+    p {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+.loading {
+    text-align: center;
+    padding: 48px;
+    color: var(--on-surface-variant);
+    font-size: 14px;
+}

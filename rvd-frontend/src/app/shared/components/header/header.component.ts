@@ -9,6 +9,9 @@ import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -24,6 +27,8 @@ import { MatInputModule } from '@angular/material/input';
     MatDatepickerModule,
     MatNativeDateModule,
     MatInputModule,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
@@ -44,27 +49,21 @@ export class HeaderComponent implements OnInit {
   dataChange = output<Date>();
   buscarClick = output<void>();
 
+  private readonly http = inject(HttpClient);
 
-  ngOnInit(): void {
-    this.lojas.set([
-      {
-        idloja: 1,
-        nome: 'Matriz Centro',
-        dePara_LinxDms: '1.1',
-        bandeira_idbandeira: 12,
-        rvdVendas: [
-          {
-            departamento_iddepartamento: 'N',
-            descricao_departamento: 'Novos',
-            integracao: '1;1;N|1',
-            legado: 'APOLLO',
-            loja_nome_bandeira: 'GM',
-            departamento: 'Novos',
-            dePara_LinxDms: '1',
-          }
-        ]
+  async ngOnInit(): Promise<void> {
+    try {
+      const lojas = await firstValueFrom(
+        this.http.get<any[]>('/api/lojas')
+      );
+      this.lojas.set(lojas);
+
+      if (lojas.length === 1) {
+        this.onLojaChange(lojas[0]);
       }
-    ]);
+    } catch (error) {
+      console.error('Erro ao carregar lojas:', error);
+    }
   }
 
   get departamentos() {
