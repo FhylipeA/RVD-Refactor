@@ -33,8 +33,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-
-
 export class HeaderComponent implements OnInit {
   isDarkMode = signal(false);
   toggleDarkMode = output<boolean>();
@@ -45,11 +43,16 @@ export class HeaderComponent implements OnInit {
   dataSelecionada = signal<Date>(new Date());
 
   lojaChange = output<any>();
-  departamentoChange = output<string>();
+  departamentoChange = output<any>();
   dataChange = output<Date>();
   buscarClick = output<void>();
 
   private readonly http = inject(HttpClient);
+
+  readonly departamentos = [
+    { codigo: 'N', descricao: 'Novos' },
+    { codigo: 'S', descricao: 'Seminovos' },
+  ];
 
   async ngOnInit(): Promise<void> {
     try {
@@ -57,17 +60,12 @@ export class HeaderComponent implements OnInit {
         this.http.get<any[]>('/api/lojas')
       );
       this.lojas.set(lojas);
-
       if (lojas.length === 1) {
         this.onLojaChange(lojas[0]);
       }
     } catch (error) {
       console.error('Erro ao carregar lojas:', error);
     }
-  }
-
-  get departamentos() {
-    return this.lojaSelecionada()?.rvdVendas ?? [];
   }
 
   onToggleDarkMode() {
@@ -85,7 +83,17 @@ export class HeaderComponent implements OnInit {
 
   onDepartamentoChange(dep: string) {
     this.departamentoSelecionado.set(dep);
-    this.departamentoChange.emit(dep);
+    const loja = this.lojaSelecionada();
+    const depDescricao = this.departamentos.find(d => d.codigo === dep)?.descricao ?? '';
+    const integracao = {
+      departamento_iddepartamento: dep,
+      descricao_departamento: depDescricao,
+      legado: loja?.legado ?? 'NBS',
+      loja_nome_bandeira: loja?.loja_nome_bandeira ?? '',
+      loja_idloja: loja?.idloja,
+      dePara_LinxDms: loja?.dePara_LinxDms,
+    };
+    this.departamentoChange.emit(integracao);
   }
 
   onDataChange(data: Date) {

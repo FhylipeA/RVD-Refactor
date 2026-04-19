@@ -5,16 +5,16 @@ import { Injectable, signal } from '@angular/core';
 })
 export class FiltroStateService {
   lojaSelecionada = signal<any>(null);
-  departamentoSelecionado = signal<string>('');
+  departamentoSelecionado = signal<any>(null);
   dataSelecionada = signal<Date>(new Date());
   buscarTrigger = signal<number>(0);
 
   setLoja(loja: any) {
     this.lojaSelecionada.set(loja);
-    this.departamentoSelecionado.set('');
+    this.departamentoSelecionado.set(null);
   }
 
-  setDepartamento(dep: string) {
+  setDepartamento(dep: any) {
     this.departamentoSelecionado.set(dep);
   }
 

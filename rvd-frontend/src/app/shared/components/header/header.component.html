@@ -29,11 +29,8 @@
     <mat-form-field appearance="outline" class="header-field">
       <mat-label>Departamento</mat-label>
       <mat-select [value]="departamentoSelecionado()" (selectionChange)="onDepartamentoChange($event.value)">
-        @for (dep of departamentos; track dep.departamento_iddepartamento) {
-        <mat-option [value]="dep.departamento_iddepartamento">
-          {{ dep.descricao_departamento }}
-        </mat-option>
-        }
+        <mat-option value="N">Novos</mat-option>
+        <mat-option value="S">Seminovos</mat-option>
       </mat-select>
     </mat-form-field>
     }

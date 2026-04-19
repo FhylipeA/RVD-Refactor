@@ -25,15 +25,18 @@ let IntegradorDmsNbsService = IntegradorDmsNbsService_1 = class IntegradorDmsNbs
     constructor(dataSource) {
         this.dataSource = dataSource;
     }
-    async getVendasFaturadas(codEmpresa, periodo) {
+    async getVendasFaturadas(codEmpresa, periodo, departamento) {
         try {
             const [ano, mes] = periodo.split('-');
             const filterString = `
-        AND A.COD_EMPRESA = ${codEmpresa}
-        AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
-        AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
-      `;
-            const instruction = (0, utils_1.geraQuery)(this.sqlDir, 'rvd-vendas-faturados', [['filterString', filterString]]);
+      AND A.COD_EMPRESA = ${codEmpresa}
+      AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
+      AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
+    `;
+            const arquivo = departamento === 'N'
+                ? 'rvd-vendas-faturados'
+                : 'rvd-usados-vendas-faturados';
+            const instruction = (0, utils_1.geraQuery)(this.sqlDir, arquivo, [['filterString', filterString]]);
             const result = await this.dataSource.query(instruction);
             return (0, utils_1.transformaElementosArrayParaCamelCase)(result);
         }
@@ -42,15 +45,18 @@ let IntegradorDmsNbsService = IntegradorDmsNbsService_1 = class IntegradorDmsNbs
             throw error;
         }
     }
-    async getVendasAFaturar(codEmpresa, periodo) {
+    async getVendasAFaturar(codEmpresa, periodo, departamento) {
         try {
             const [ano, mes] = periodo.split('-');
             const filterString = `
-        AND A.COD_EMPRESA = ${codEmpresa}
-        AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
-        AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
-      `;
-            const instruction = (0, utils_1.geraQuery)(this.sqlDir, 'rvd-vendas-a-faturar', [['filterString', filterString]]);
+      AND A.COD_EMPRESA = ${codEmpresa}
+      AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
+      AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
+    `;
+            const arquivo = departamento === 'N'
+                ? 'rvd-vendas-a-faturar'
+                : 'rvd-usados-vendas-a-faturar';
+            const instruction = (0, utils_1.geraQuery)(this.sqlDir, arquivo, [['filterString', filterString]]);
             const result = await this.dataSource.query(instruction);
             return (0, utils_1.transformaElementosArrayParaCamelCase)(result);
         }

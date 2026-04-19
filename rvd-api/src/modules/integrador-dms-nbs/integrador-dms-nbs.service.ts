@@ -12,23 +12,28 @@ export class IntegradorDmsNbsService {
   constructor(
     @InjectDataSource('nbs-dms')
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async getVendasFaturadas(
     codEmpresa: string,
     periodo: string,
+    departamento: string,
   ): Promise<VendaNbs[]> {
     try {
       const [ano, mes] = periodo.split('-');
       const filterString = `
-        AND A.COD_EMPRESA = ${codEmpresa}
-        AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
-        AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
-      `;
+      AND A.COD_EMPRESA = ${codEmpresa}
+      AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
+      AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
+    `;
+
+      const arquivo = departamento === 'N'
+        ? 'rvd-vendas-faturados'
+        : 'rvd-usados-vendas-faturados';
 
       const instruction = geraQuery(
         this.sqlDir,
-        'rvd-vendas-faturados',
+        arquivo,
         [['filterString', filterString]],
       );
 
@@ -43,18 +48,23 @@ export class IntegradorDmsNbsService {
   async getVendasAFaturar(
     codEmpresa: string,
     periodo: string,
+    departamento: string,
   ): Promise<VendaNbs[]> {
     try {
       const [ano, mes] = periodo.split('-');
       const filterString = `
-        AND A.COD_EMPRESA = ${codEmpresa}
-        AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
-        AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
-      `;
+      AND A.COD_EMPRESA = ${codEmpresa}
+      AND EXTRACT(YEAR FROM A.EMISSAO) = ${ano}
+      AND EXTRACT(MONTH FROM A.EMISSAO) = ${mes}
+    `;
+
+      const arquivo = departamento === 'N'
+        ? 'rvd-vendas-a-faturar'
+        : 'rvd-usados-vendas-a-faturar';
 
       const instruction = geraQuery(
         this.sqlDir,
-        'rvd-vendas-a-faturar',
+        arquivo,
         [['filterString', filterString]],
       );
 

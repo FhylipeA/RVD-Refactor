@@ -38,8 +38,8 @@ let CadastroVendasService = CadastroVendasService_1 = class CadastroVendasServic
             const codEmpresa = integracao.dePara_LinxDms;
             const departamento = integracao.departamento_iddepartamento;
             const [faturadas, aFaturar, devolvidas] = await Promise.all([
-                this.integradorNbs.getVendasFaturadas(codEmpresa, periodo),
-                this.integradorNbs.getVendasAFaturar(codEmpresa, periodo),
+                this.integradorNbs.getVendasFaturadas(codEmpresa, periodo, departamento),
+                this.integradorNbs.getVendasAFaturar(codEmpresa, periodo, departamento),
                 this.integradorNbs.getPropostasDevolvidas(codEmpresa, periodo),
             ]);
             const todasVendasNbs = [...faturadas, ...aFaturar, ...devolvidas];

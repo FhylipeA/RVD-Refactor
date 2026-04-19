@@ -11,7 +11,7 @@ export class CadastroVendasService {
   constructor(
     private readonly rvdVendaService: RvdVendaService,
     private readonly integradorNbs: IntegradorDmsNbsService,
-  ) {}
+  ) { }
 
   validaAFaturarPremium(integracao: Integracao): boolean {
     return (
@@ -38,8 +38,8 @@ export class CadastroVendasService {
 
       // Busca paralela no Oracle NBS
       const [faturadas, aFaturar, devolvidas] = await Promise.all([
-        this.integradorNbs.getVendasFaturadas(codEmpresa, periodo),
-        this.integradorNbs.getVendasAFaturar(codEmpresa, periodo),
+        this.integradorNbs.getVendasFaturadas(codEmpresa, periodo, departamento),
+        this.integradorNbs.getVendasAFaturar(codEmpresa, periodo, departamento),
         this.integradorNbs.getPropostasDevolvidas(codEmpresa, periodo),
       ]);
 

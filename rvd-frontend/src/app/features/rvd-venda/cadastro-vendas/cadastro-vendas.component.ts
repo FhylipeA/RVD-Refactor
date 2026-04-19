@@ -192,13 +192,14 @@ export class CadastroVendasComponent implements OnInit {
       const trigger = this.filtroState.buscarTrigger();
       if (trigger > 0) {
         const loja = this.filtroState.lojaSelecionada();
-        const dep = this.filtroState.departamentoSelecionado();
+        const integracao = this.filtroState.departamentoSelecionado();
         const data = this.filtroState.dataSelecionada();
-        if (loja && dep) {
+        if (loja && integracao) {
           this.lojaSelecionada.set(loja);
-          this.departamentoSelecionado.set(dep);
+          this.departamentoSelecionado.set(integracao.departamento_iddepartamento);
+          this.integracao.set(integracao);
           this.dataSelecionada.set(data);
-          this.filtrarDepartamento().then(() => this.buscarVendas());
+          this.buscarVendas();
         }
       }
     });
@@ -248,10 +249,17 @@ export class CadastroVendasComponent implements OnInit {
     const loja = this.lojaSelecionada();
     const departamento = this.departamentoSelecionado();
     if (!loja || !departamento) return;
-    const integracao = loja.rvdVendas?.find(
-      (obj: any) => obj.departamento_iddepartamento === departamento
-    );
-    this.integracao.set(integracao ?? null);
+
+    const integracao = {
+      departamento_iddepartamento: departamento,
+      descricao_departamento: departamento === 'N' ? 'Novos' : 'Seminovos',
+      legado: 'NBS',
+      loja_nome_bandeira: loja.loja_nome_bandeira ?? '',
+      loja_idloja: loja.idloja,
+      dePara_LinxDms: loja.dePara_LinxDms,
+    };
+
+    this.integracao.set(integracao);
   }
 
   async buscarVendas(): Promise<void> {
