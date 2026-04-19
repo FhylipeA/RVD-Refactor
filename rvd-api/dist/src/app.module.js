@@ -13,6 +13,7 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const rvd_venda_module_1 = require("./modules/rvd-venda/rvd-venda.module");
 const cadastro_vendas_module_1 = require("./modules/cadastro-vendas/cadastro-vendas.module");
 const integrador_dms_nbs_module_1 = require("./modules/integrador-dms-nbs/integrador-dms-nbs.module");
+const loja_module_1 = require("./modules/loja/loja.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,6 +25,7 @@ exports.AppModule = AppModule = __decorate([
             rvd_venda_module_1.RvdVendaModule,
             cadastro_vendas_module_1.CadastroVendasModule,
             integrador_dms_nbs_module_1.IntegradorDmsNbsModule,
+            loja_module_1.LojaModule,
         ],
     })
 ], AppModule);

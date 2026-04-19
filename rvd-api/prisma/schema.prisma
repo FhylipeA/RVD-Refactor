@@ -56,3 +56,31 @@ model RvdVenda {
   @@index([chave_proposta_loja_dms])
   @@map("rvd_venda")
 }
+
+model Loja {
+  id                  Int              @id @default(autoincrement())
+  nome                String           @db.VarChar(100)
+  dePara_LinxDms      String           @db.VarChar(20)
+  bandeira_idbandeira Int?
+  ativo               Boolean          @default(true)
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @updatedAt
+  departamentos       RvdVendaConfig[]
+
+  @@map("loja")
+}
+
+model RvdVendaConfig {
+  id                          Int      @id @default(autoincrement())
+  loja_id                     Int
+  departamento_iddepartamento String   @db.VarChar(2)
+  descricao_departamento      String   @db.VarChar(100)
+  legado                      String   @db.VarChar(20)
+  loja_nome_bandeira          String?  @db.VarChar(50)
+  ativo                       Boolean  @default(true)
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @updatedAt
+  loja                        Loja     @relation(fields: [loja_id], references: [id])
+
+  @@map("rvd_venda_config")
+}
