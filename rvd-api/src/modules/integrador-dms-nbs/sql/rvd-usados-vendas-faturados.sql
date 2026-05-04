@@ -19,24 +19,35 @@ SELECT
   a.nome_cliente AS NOME_CLIENTE,
   b.descricao_modelo AS MODELO,
   p.descricao_produto AS TIPO_DE_MODELO,
+  nm.DESCRICAO_NOTA_MODELO AS TIPO,
   a.preco_basico AS PRECO_SUGERIDO,
   v.valor_vendido AS VALOR_NOTA_VENDA,
   v.total_nota_fabrica AS VALOR_NF_FABRICA,
   TO_DATE(v.data_venda, 'DD/MM/YYYY') - TO_DATE(a.emissao, 'DD/MM/YYYY') AS DIAS_ATE_FATURAR,
   'FATURADO' AS STATUS
 FROM veiculos_propostas a
-JOIN produtos_modelos b ON a.cod_produto = b.cod_produto AND a.cod_modelo = b.cod_modelo
-JOIN NOTAS_MODELOS nm ON b.COD_NOTA_MODELO = nm.COD_NOTA_MODELO
-JOIN produtos p ON b.cod_produto = p.cod_produto
-JOIN empresas emp ON a.cod_empresa = emp.cod_empresa
-LEFT JOIN clientes c ON a.cod_cliente = c.cod_cliente
-JOIN empresas_usuarios eu ON a.vendedor = eu.nome
-LEFT JOIN veiculos v ON a.cod_produto = v.cod_produto
+JOIN produtos_modelos b
+  ON a.cod_produto = b.cod_produto
+  AND a.cod_modelo = b.cod_modelo
+JOIN NOTAS_MODELOS nm
+  ON b.COD_NOTA_MODELO = nm.COD_NOTA_MODELO
+JOIN produtos p
+  ON b.cod_produto = p.cod_produto
+JOIN empresas emp
+  ON a.cod_empresa = emp.cod_empresa
+LEFT JOIN clientes c
+  ON a.cod_cliente = c.cod_cliente
+JOIN empresas_usuarios eu
+  ON a.vendedor = eu.nome
+LEFT JOIN veiculos v
+  ON a.cod_produto = v.cod_produto
   AND a.cod_modelo = v.cod_modelo
   AND a.chassi_resumido = v.chassi_resumido
   AND a.cod_empresa = v.cod_empresa
-LEFT JOIN patio pt ON v.cod_patio = pt.cod_patio
-LEFT JOIN EMPRESAS_DEPARTAMENTOS ed ON ed.COD_EMPRESA = eu.COD_EMPRESA
+LEFT JOIN patio pt
+  ON v.cod_patio = pt.cod_patio
+LEFT JOIN EMPRESAS_DEPARTAMENTOS ed
+  ON ed.COD_EMPRESA = eu.COD_EMPRESA
   AND ed.COD_EMPRESA_DEPARTAMENTO = eu.COD_EMPRESA_DEPARTAMENTO
 WHERE a.status_proposta = 'V'
 AND v.NOVO_USADO IN ('U', 'P')

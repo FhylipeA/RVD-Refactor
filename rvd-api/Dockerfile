@@ -1,17 +1,22 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.23/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.23/community" >> /etc/apk/repositories
 RUN apk add --no-cache openssl libaio
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY . .
-RUN npm run build
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 RUN npx prisma generate
+RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
 ENV NODE_ENV=production
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.23/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.23/community" >> /etc/apk/repositories
 RUN apk add --no-cache openssl libaio libnsl libc6-compat wget unzip && \
-  wget -q https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip -O /tmp/ic.zip && \
+  wget -q --no-check-certificate https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip -O /tmp/ic.zip && \
   unzip /tmp/ic.zip -d /opt/oracle && \
   rm /tmp/ic.zip && \
   ln -s /opt/oracle/instantclient_21_12 /opt/oracle/instantclient && \

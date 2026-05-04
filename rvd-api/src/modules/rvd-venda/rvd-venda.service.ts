@@ -9,9 +9,9 @@ import { MaisInformacoes } from './rvd-venda.interface';
 export class RvdVendaService {
   constructor(private readonly prisma: PrismaService) { }
 
-  private toJsonValue(value: unknown): Prisma.InputJsonValue | typeof Prisma.JsonNull {
-    if (value === null || value === undefined) return Prisma.JsonNull;
-    return value as Prisma.InputJsonValue;
+  private toJsonValue(value: unknown): any {
+    if (value === null || value === undefined) return null;
+    return value;
   }
 
   private prepareVendaData(venda: CreateRvdVendaDto) {
@@ -99,7 +99,7 @@ export class RvdVendaService {
     nro_propostas: number[],
     aFaturarPremium: boolean,
   ) {
-    const orConditions: Prisma.RvdVendaWhereInput[] = [];
+    const orConditions: any[] = [];
 
     if (nro_propostas.length > 0) {
       orConditions.push({ nro_proposta: { in: nro_propostas } });
@@ -107,7 +107,7 @@ export class RvdVendaService {
 
     if (aFaturarPremium) {
       orConditions.push({
-        a_faturar_premium: { not: Prisma.JsonNull },
+        a_faturar_premium: { not: 'DbNull' as any },
         status_a_faturar: { notIn: ['REALIZADO', 'DEVOLVIDO'] },
       });
     }
@@ -139,7 +139,7 @@ export class RvdVendaService {
         loja_idloja,
         departamento_iddepartamento,
         devolucao: false,
-        a_faturar_premium: { not: Prisma.JsonNull },
+        a_faturar_premium: { not: 'DbNull' as any },
         status_a_faturar: { notIn: ['REALIZADO', 'DEVOLVIDO'] },
       },
       orderBy: { created_at: 'asc' },
@@ -157,7 +157,7 @@ export class RvdVendaService {
         departamento_iddepartamento,
         devolucao: false,
         status_a_faturar: { not: 'REALIZADO' },
-        a_faturar_premium: { not: Prisma.JsonNull },
+        a_faturar_premium: { not: 'DbNull' as any },
       },
       orderBy: { created_at: 'asc' },
     });

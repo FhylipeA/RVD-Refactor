@@ -26,6 +26,15 @@ export class CadastroVendasService {
     );
   }
 
+  private mapearStatus(statusOracle: string): string {
+    const mapa: Record<string, string> = {
+      'FATURADO': 'REALIZADO',
+      'A_FATURAR': 'PENDENTE',
+      'DEVOLVIDO': 'DEVOLVIDO',
+    };
+    return mapa[statusOracle] ?? null;
+  }
+
   async findVendasVeiculos(
     idLoja: number,
     periodo: string,
@@ -42,6 +51,11 @@ export class CadastroVendasService {
         this.integradorNbs.getVendasAFaturar(codEmpresa, periodo, departamento),
         this.integradorNbs.getPropostasDevolvidas(codEmpresa, periodo),
       ]);
+
+      this.logger.log(`Faturadas: ${faturadas.length}`);
+      this.logger.log(`A faturar: ${aFaturar.length}`);
+      this.logger.log(`Devolvidas: ${devolvidas.length}`);
+      this.logger.log(`Primeira faturada: ${JSON.stringify(faturadas[0])}`);
 
       const todasVendasNbs = [...faturadas, ...aFaturar, ...devolvidas];
 
@@ -60,8 +74,8 @@ export class CadastroVendasService {
       );
 
       // Monta mapa de RVD por chassi para merge rápido
-      const rvdMap = new Map(
-        rvdExistentes.map(r => [r.chassi, r]),
+      const rvdMap = new Map<string, any>(
+        rvdExistentes.map((r: any) => [r.chassi, r]),
       );
 
       // Merge: dados do DMS + dados editáveis do RVD
@@ -100,7 +114,7 @@ export class CadastroVendasService {
           devolucao: venda.status === 'DEVOLVIDO',
 
           // Dados editáveis do RVD (se existirem)
-          status_a_faturar: rvd?.status_a_faturar ?? null,
+          status_a_faturar: rvd?.status_a_faturar ?? this.mapearStatus(venda.status) ?? null,
           veiculo_capturado: rvd?.veiculo_capturado ?? null,
           valor_sinal: rvd?.valor_sinal ?? 0,
           valor_compra: rvd?.valor_compra ?? venda.valorNotaVenda ?? null,
