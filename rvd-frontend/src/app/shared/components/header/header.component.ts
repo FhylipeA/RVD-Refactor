@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-header',
@@ -119,5 +120,13 @@ export class HeaderComponent implements OnInit {
   getUserRole(): string {
     const user = JSON.parse(localStorage.getItem('user') ?? '{}');
     return user?.role ?? user?.jobTitle ?? 'Gerente Comercial';
+  }
+
+  onMesAnoSelecionado(data: Date, picker: MatDatepicker<Date>): void {
+    // Seta o primeiro dia do mês selecionado
+    const primeiroDia = new Date(data.getFullYear(), data.getMonth(), 1);
+    this.dataSelecionada.set(primeiroDia);
+    this.dataChange.emit(primeiroDia);
+    picker.close();
   }
 }
